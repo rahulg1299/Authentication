@@ -5,10 +5,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-//(**Level-2**) const encrypt = require('mongoose-encryption');
-//(**Level-3**) const md5 = require('md5');
-//(**Level-4**) const bcrypt = require('bcrypt');
-//(**Level-4**) const saltRounds = 10;
 const session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
@@ -39,7 +35,6 @@ const userSchema = new mongoose.Schema({
     secret: String
 });
 
-//(**Level-2**) userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
@@ -52,7 +47,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  User.findById(id, function(err, user) {
+  User.findById(id, (err, user) => {
     done(err, user);
   });
 });
@@ -64,7 +59,7 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    User.findOrCreate({ googleId: profile.id }, (err, user) => {
       return cb(err, user);
     });
   }
@@ -90,24 +85,6 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
 
-    // *********************(LEVEL-4)******************
-    // bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-
-    //     const newUser = new User({
-    //         email: req.body.username,
-    //         //(**Level-3**) password: md5(req.body.password)
-    //         password: hash
-    //     });
-
-    //     newUser.save((err) => {
-    //         if(err) {
-    //             console.log(err);
-    //         } else {
-    //             res.render('secrets');
-    //         }
-    //     });
-    // });
-
     User.register({username: req.body.username}, req.body.password, (err, user) => {
         if(err) {
             console.log(err);
@@ -126,25 +103,6 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    
-    // *********************(LEVEL-4)******************
-    // const username = req.body.username;
-    // //(**Level-3**) const password = md5(req.body.password);
-    // const password = req.body.password;
-
-    // User.findOne({email: username}, (err, foundUser) => {
-    //     if(err) {
-    //         console.log(err);
-    //     } else {
-    //         if(foundUser) {
-    //             bcrypt.compare(password, foundUser.password, (err, result) => {
-    //                 if(result === true) {
-    //                     res.render('secrets');
-    //                 }
-    //             }); 
-    //         }   
-    //     }
-    // })
 
     const user = new User({
         username: req.body.username,
